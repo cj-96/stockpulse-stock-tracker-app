@@ -8,9 +8,12 @@ import SelectField from "@/components/forms/SelectField";
 import {INVESTMENT_GOALS, PREFERRED_INDUSTRIES, RISK_TOLERANCE_OPTIONS} from "@/lib/constants";
 import {CountrySelectField} from "@/components/forms/CountrySelectField";
 import FooterLink from "@/components/forms/FooterLink";
+import {signUpWithEmail} from "@/lib/actions/auth.action";
+import {useRouter} from "next/navigation";
+import {toast} from "sonner";
 
 const SignUp = () => {
-
+const router = useRouter();
     const {
         register,
         handleSubmit,
@@ -30,9 +33,13 @@ const SignUp = () => {
     }, );
     const onSubmit = async (data: SignUpFormData) => {
         try {
-            console.log(data);
+            const result = await signUpWithEmail(data);
+            if (result.success) router.push('/');
         } catch (err) {
             console.log(err);
+            toast.error('Failed to sign up',{
+                description: err instanceof Error ? err.message : 'Failed to sign up'
+            });
         }
     }
     return (
@@ -77,14 +84,6 @@ const SignUp = () => {
                 register={register}
                 error={errors.password}
                 validation={{required: 'Password is required', minLength: 8}}
-            />
-            <InputField
-                name="fullName"
-                label="Full Name"
-                placeholder="John Doe"
-                register={register}
-                error={errors.fullName}
-                validation={{required: 'Full name is required', minLength: 2}}
             />
 
             <SelectField
